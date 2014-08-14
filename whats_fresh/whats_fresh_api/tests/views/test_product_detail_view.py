@@ -49,3 +49,21 @@ class ProductViewTestCase(TestCase):
 
         expected_answer = json.loads(self.expected_json)
         self.assertTrue(parsed_answer == expected_answer)
+
+    def test_missing_product_id(self):
+        expected_error = """
+{
+  "error": {
+    "error_status": true,
+    "error_text": "Product with id 999 not found!",
+    "error_name": "Product Not Found",
+    "error_level": "Important"
+  }
+}"""
+        c = Client()
+        response = c.get(reverse('product-details', kwargs={'id': '999'}))
+        self.assertTrue(response.status_code == 200)
+
+        parsed_answer = json.loads(response.content)
+        expected_answer = json.loads(expected_error)
+        self.assertTrue(parsed_answer == expected_answer)

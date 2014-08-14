@@ -32,3 +32,21 @@ class StoriesTestCase(TestCase):
 
         expected_answer = json.loads(self.expected_json)
         self.assertTrue(parsed_answer == expected_answer)
+
+    def test_missing_story_id(self):
+        expected_error = """
+{
+  "error": {
+    "error_status": true,
+    "error_text": "Story with id 999 not found!",
+    "error_name": "Story Not Found",
+    "error_level": "Important"
+  }
+}"""
+        c = Client()
+        response = c.get(reverse('story-details', kwargs={'id': '999'}))
+        self.assertTrue(response.status_code == 200)
+
+        parsed_answer = json.loads(response.content)
+        expected_answer = json.loads(expected_error)
+        self.assertTrue(parsed_answer == expected_answer)
