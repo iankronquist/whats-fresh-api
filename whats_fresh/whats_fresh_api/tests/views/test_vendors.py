@@ -1212,8 +1212,6 @@ class VendorsLocationTestCase(TestCase):
             '%s?lat=44.609079&long=-124.052538&limit=3' % reverse('vendors-list')
             ).content)
 
-        print all_vendors_data
-
         expected_answer = json.loads(self.expected_nearby_limit_3)
         self.assertEqual(all_vendors_data, expected_answer)
 

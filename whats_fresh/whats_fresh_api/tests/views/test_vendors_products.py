@@ -251,6 +251,7 @@ class VendorsProductsLocationTestCase(TestCase):
     "products": [
       {
         "product_id": 1,
+        "preparation_id": 1,
         "preparation": "Frozen",
         "name": "Halibut"
       }
@@ -328,6 +329,7 @@ class VendorsProductsLocationTestCase(TestCase):
     "products": [
       {
         "product_id": 1,
+        "preparation_id": 1,
         "preparation": "Frozen",
         "name": "Halibut"
       }
@@ -345,7 +347,7 @@ class VendorsProductsLocationTestCase(TestCase):
     "status": true,
     "text": "There was an error with the given coordinates not_a_latitude, not_a_longitude",
     "name": "Bad location",
-    "debug": "String or unicode input unrecognized as WKT EWKT, and HEXEWKB."
+    "debug": "ValueError: String or unicode input unrecognized as WKT EWKT, and HEXEWKB."
   },
   "vendors": [{
     "id": 2,
@@ -454,7 +456,7 @@ class VendorsProductsLocationTestCase(TestCase):
     "status": true,
     "name": "Bad location",
     "text": "There was an error with the given coordinates -45.232, None",
-    "debug": "Error encountered checking Geometry returned from GEOS C function \\"GEOSWKTReader_read_r\\"."
+    "debug": "GEOSException: Error encountered checking Geometry returned from GEOS C function \\"GEOSWKTReader_read_r\\"."
   },
   "vendors": [{
     "id": 2,
@@ -563,7 +565,7 @@ class VendorsProductsLocationTestCase(TestCase):
     "status": true,
     "name": "Bad location",
     "text": "There was an error with the given coordinates None, -45.232",
-    "debug": "Error encountered checking Geometry returned from GEOS C function \\"GEOSWKTReader_read_r\\"."
+    "debug": "GEOSException: Error encountered checking Geometry returned from GEOS C function \\"GEOSWKTReader_read_r\\"."
   },
   "vendors": [{
     "id": 2,
@@ -681,10 +683,10 @@ class VendorsProductsLocationTestCase(TestCase):
         Test that good parameters return vendor/product results ordered by
         location. There will also be a default limit of 20 miles.
         """
-        halibut_near_newport = self.client.get(
+        halibut_near_newport = json.loads(self.client.get(
             '%s?lat=44.609079&long=-124.052538' % reverse('vendors-products',
                                                      kwargs={'id': '1'})
-            ).content
+            ).content)
 
         expected_answer = json.loads(self.expected_halibut)
         self.assertEqual(expected_answer, expected_answer)
@@ -694,10 +696,10 @@ class VendorsProductsLocationTestCase(TestCase):
         Test that good parameters return vendor/product results ordered by
         location. There will also be a default limit of 20 miles.
         """
-        halibut_near_newport_limit = self.client.get(
+        halibut_near_newport_limit = json.loads(self.client.get(
             '%s?lat=44.609079&long=-124.052538&limit=1' % reverse(
                 'vendors-products', kwargs={'id': '1'})
-            ).content
+            ).content)
 
         expected_answer = json.loads(self.expected_halibut_limit_1)
         self.assertEqual(halibut_near_newport_limit, expected_answer)
@@ -707,10 +709,10 @@ class VendorsProductsLocationTestCase(TestCase):
         Test that a limit larger than the length of the list does not
         affect the list.
         """
-        halibut_near_newport = self.client.get(
+        halibut_near_newport = json.loads(self.client.get(
             '%s?lat=44.609079&long=-124.052538&limit=10' % reverse(
                 'vendors-products', kwargs={'id': '1'})
-            ).content
+            ).content)
 
         expected_answer = json.loads(self.expected_halibut)
         self.assertEqual(expected_answer, expected_answer)
@@ -720,10 +722,10 @@ class VendorsProductsLocationTestCase(TestCase):
         Test that good parameters return vendor/product results ordered by
         location. There will also be a default limit of 20 miles.
         """
-        halibut_near_newport_limit = self.client.get(
+        halibut_near_newport_limit = json.loads(self.client.get(
             '%s?lat=44.609079&long=-124.052538&limit=cat' % reverse(
                 'vendors-products', kwargs={'id': '1'})
-            ).content
+            ).content)
 
         expected_answer = json.loads(self.expected_halibut_bad_limit)
         self.assertEqual(halibut_near_newport_limit, expected_answer)

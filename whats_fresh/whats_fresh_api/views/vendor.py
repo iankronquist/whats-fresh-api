@@ -13,12 +13,25 @@ def vendor_list(request):
 
     lat = request.GET.get('lat', None)
     lng = request.GET.get('long', None)
+    limit = request.GET.get('limit', None)
 
     if lat or lng:
+        if limit:
+            try:
+                limit = int(limit)
+            except Exception as e:
+                data['error'] = {
+                    "level": "Warning",
+                    "status": True,
+                    "name": "Bad Limit",
+                    "text": "Invalid limit. Returning all results.",
+                    'debug': "{0}: {1}".format(type(e).__name__, str(e)),
+                }
+                limit = None
         try:
             point = fromstr('POINT(%s %s)' % (lng, lat), srid=4326)
             vendor_list = Vendor.objects.filter(
-                location__distance_lte=(point, D(mi=20)))
+                location__distance_lte=(point, D(mi=20)))[:limit]
         except Exception as e:
             data['error'] = {
                 "level": "Warning",
@@ -113,13 +126,26 @@ def vendors_products(request, id=None):
 
     lat = request.GET.get('lat', None)
     lng = request.GET.get('long', None)
+    limit = request.GET.get('limit', None)
 
     if lat or lng:
+        if limit:
+            try:
+                limit = int(limit)
+            except Exception as e:
+                data['error'] = {
+                    "level": "Warning",
+                    "status": True,
+                    "name": "Bad Limit",
+                    "text": "Invalid limit. Returning all results.",
+                    'debug': "{0}: {1}".format(type(e).__name__, str(e)),
+                }
+                limit = None
         try:
             point = fromstr('POINT(%s %s)' % (lng, lat), srid=4326)
             vendor_list = Vendor.objects.filter(
                 vendorproduct__product_preparation__product__id__exact=id,
-                location__distance_lte=(point, D(mi=20)))
+                location__distance_lte=(point, D(mi=20)))[:limit]
         except Exception as e:
             data['error'] = {
                 "level": "Warning",
@@ -127,7 +153,7 @@ def vendors_products(request, id=None):
                 "name": "Bad location",
                 "text": "There was an error with the "
                     "given coordinates {0}, {1}".format(lat, lng),
-                "debug": str(e)
+                'debug': "{0}: {1}".format(type(e).__name__, str(e))
             }
             vendor_list = Vendor.objects.filter(
                 vendorproduct__product_preparation__product__id__exact=id)
